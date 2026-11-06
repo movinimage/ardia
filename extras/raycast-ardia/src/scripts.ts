@@ -80,6 +80,17 @@ export function activateScript(target = APP_TARGET) {
   return `tell ${target} to activate`;
 }
 
+export function isRunningScript(target = APP_TARGET) {
+  return `return running of ${target}`;
+}
+
+export function openURLScript(url: string, target = APP_TARGET) {
+  return `tell ${target}
+  activate
+  make new tab with properties {URL:${quote(url)}}
+end tell`;
+}
+
 export function listProfilesScript(target = APP_TARGET) {
   return `set fs to character id 31
 set rs to character id 30

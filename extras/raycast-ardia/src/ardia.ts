@@ -3,10 +3,12 @@ import {
   activateScript,
   closeTabScript,
   focusTabScript,
+  isRunningScript,
   listProfilesScript,
   listTabsScript,
   newTabScript,
   newWindowScript,
+  openURLScript,
   parseProfiles,
   parseTabs,
   profileNamed,
@@ -23,10 +25,21 @@ export async function getTabs(): Promise<Tab[]> {
 }
 
 export function useTabs() {
-  return useCachedPromise(getTabs, [], { keepPreviousData: true });
+  return useCachedPromise(getTabs, [], { keepPreviousData: true, onError: keepSavedTabs });
+}
+
+function keepSavedTabs() {}
+
+export async function isRunning(): Promise<boolean> {
+  return (await runAppleScript(isRunningScript())) === "true";
 }
 
 export async function focusTab(tab: Tab) {
+  if (!(await isRunning())) {
+    if (!tab.url) throw new Error("Ardia isn't running, and this tab has no address to reopen.");
+    await runAppleScript(openURLScript(tab.url));
+    return;
+  }
   await runAppleScript(focusTabScript(tab));
   await runAppleScript(activateScript());
 }

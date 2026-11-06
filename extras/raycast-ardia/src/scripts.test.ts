@@ -4,8 +4,10 @@ import {
   closeTabScript,
   focusTabScript,
   listProfilesScript,
+  isRunningScript,
   listTabsScript,
   newTabScript,
+  openURLScript,
   newWindowScript,
   parseProfiles,
   parseTabs,
@@ -91,5 +93,16 @@ test("makes a tab with what was typed, or an empty one", () => {
   assert.equal(
     newTabScript('say "hi"', "current application"),
     'tell current application to make new tab with properties {URL:"say \\"hi\\""}',
+  );
+});
+
+test("asks whether the app is running, and reopens a saved tab by address when it is not", () => {
+  assert.equal(isRunningScript(), 'return running of application id "com.ardia.browser"');
+  assert.equal(
+    openURLScript('https://example.com/?q="a"'),
+    `tell application id "com.ardia.browser"
+  activate
+  make new tab with properties {URL:"https://example.com/?q=\\"a\\""}
+end tell`,
   );
 });
