@@ -5,7 +5,11 @@ windows, like Dia's Raycast extension.
 
 **Search Tabs** lists every window's tabs (sidebar order, front window first), with the page's
 favicon, its host, a pin for pinned tabs, "Current" for the tab the front window shows and the
-window number when more than one is open. Type to filter by title or URL.
+window number when more than one is open. Typing searches titles and hosts as written: tabs whose title
+starts with it come first, then a word in the title starting with it, then the title containing it, then
+the host. When every typed word appears but not together, the tab comes next. Tabs whose title words
+start with the typed letters (`gads` for "Google Ads") follow under Other matches. Ties keep sidebar
+order. While Ardia is closed it shows the tabs it last saw; switching to one opens its address.
 
 | Action | Shortcut |
 |---|---|

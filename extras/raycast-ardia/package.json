@@ -85,6 +85,6 @@
     "dev": "ray develop",
     "lint": "ray lint",
     "fix-lint": "ray lint --fix",
-    "test": "node --test src/scripts.test.ts"
+    "test": "node --test src/scripts.test.ts src/match.test.ts"
   }
 }
