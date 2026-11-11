@@ -1,5 +1,5 @@
 import { open } from "@raycast/api";
-import { runAppleScript, useCachedPromise } from "@raycast/utils";
+import { runAppleScript, useCachedPromise, useCachedState, usePromise } from "@raycast/utils";
 import {
   activateScript,
   ARDIA_CLOSED,
@@ -32,8 +32,12 @@ export async function getTabs(): Promise<Tab[]> {
   return parseTabs(await runAppleScript(listTabsScript(), { timeout: 10_000 }));
 }
 
+const SAVED_TABS_KEY = "tabs";
+
 export function useTabs() {
-  return useCachedPromise(getTabs, [], { keepPreviousData: true, onError: keepSavedTabs });
+  const [savedTabs, setSavedTabs] = useCachedState<Tab[]>(SAVED_TABS_KEY);
+  const tabs = usePromise(getTabs, [], { onData: setSavedTabs, onError: keepSavedTabs });
+  return { ...tabs, data: tabs.data ?? savedTabs };
 }
 
 function keepSavedTabs() {}

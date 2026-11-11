@@ -85,7 +85,7 @@ export default function Command() {
   async function close(tab: Tab) {
     try {
       await mutate(closeTab(tab), {
-        optimisticUpdate: (tabs) => tabs?.filter((t) => !(t.windowId === tab.windowId && t.tabId === tab.tabId)),
+        optimisticUpdate: (tabs = []) => tabs.filter((t) => !(t.windowId === tab.windowId && t.tabId === tab.tabId)),
       });
       await showToast({ style: Toast.Style.Success, title: "Closed tab" });
     } catch (e) {
