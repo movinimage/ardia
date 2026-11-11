@@ -9,7 +9,8 @@ window number when more than one is open. Typing searches titles and hosts as wr
 starts with it come first, then a word in the title starting with it, then the title containing it, then
 the host. When every typed word appears but not together, the tab comes next. Tabs whose title words
 start with the typed letters (`gads` for "Google Ads") follow under Other matches. Ties keep sidebar
-order. While Ardia is closed it shows the tabs it last saw; switching to one opens its address.
+order. While Ardia is closed or has no window open, it shows the tabs it last saw, and switching to one
+opens its address in Ardia.
 
 | Action | Shortcut |
 |---|---|
@@ -35,8 +36,8 @@ Raycast's fallback commands and text typed in Raycast's root search can go strai
 matter, and the start of a name is enough when no other profile starts the same way; when several
 do, it names them and opens nothing). **New Incognito Window** opens an incognito one.
 
-It talks to Ardia through its AppleScript dictionary (`Ardia.sdef` in the app), so
-Ardia has to be running. The first time, macOS asks whether Raycast may control Ardia
+It talks to Ardia through its AppleScript dictionary (`Ardia.sdef` in the app), so every command except
+Search Tabs' saved list needs Ardia running. The first time, macOS asks whether Raycast may control Ardia
 (System Settings › Privacy & Security › Automation); allow it.
 
 ## Install (development)
@@ -57,9 +58,14 @@ and how it reads the answer.
 
 `src/scripts.ts` builds the AppleScript (no Raycast imports, so it can be tested on its own):
 
-- the list reads `id`, `title`, `URL`, `isPinned` and `isFocused` of every tab of each window,
-  one Apple event per property and window, joined with ASCII separators;
-- Switch runs `focus (tab id "…" of window id "…")`, then `activate`;
+- `return running of application id "…"` checks that Ardia is running in a script with no `tell` block,
+  because any script that names an app in a `tell` block starts that app when it loads; the list and
+  the window check only run after it says yes;
+- the list stops with an error when Ardia has no window, so the saved list stays; otherwise it reads
+  `id`, `title`, `URL`, `isPinned` and `isFocused` of every tab of each window, one Apple event per
+  property and window, joined with ASCII separators;
+- Switch runs `focus (tab id "…" of window id "…")`, then `activate`; with no Ardia window it opens
+  the tab's address in Ardia instead;
 - Close runs `close (tab id "…" of window id "…")`;
 - the profile list reads `id` and `name` of every profile, counts each one's tabs, and marks the
   `active profile` of window 1 (none when it's incognito);

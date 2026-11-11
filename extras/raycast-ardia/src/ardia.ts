@@ -1,14 +1,17 @@
+import { open } from "@raycast/api";
 import { runAppleScript, useCachedPromise } from "@raycast/utils";
 import {
   activateScript,
+  ARDIA_CLOSED,
+  BUNDLE_ID,
   closeTabScript,
   focusTabScript,
+  hasOpenWindowScript,
   isRunningScript,
   listProfilesScript,
   listTabsScript,
   newTabScript,
   newWindowScript,
-  openURLScript,
   parseProfiles,
   parseTabs,
   profileNamed,
@@ -20,7 +23,12 @@ import {
 
 export type { Profile, Tab } from "./scripts";
 
+export async function isRunning(): Promise<boolean> {
+  return (await runAppleScript(isRunningScript())) === "true";
+}
+
 export async function getTabs(): Promise<Tab[]> {
+  if (!(await isRunning())) throw new Error(ARDIA_CLOSED);
   return parseTabs(await runAppleScript(listTabsScript(), { timeout: 10_000 }));
 }
 
@@ -30,14 +38,14 @@ export function useTabs() {
 
 function keepSavedTabs() {}
 
-export async function isRunning(): Promise<boolean> {
-  return (await runAppleScript(isRunningScript())) === "true";
+export async function hasOpenWindow(): Promise<boolean> {
+  return (await isRunning()) && (await runAppleScript(hasOpenWindowScript())) === "true";
 }
 
 export async function focusTab(tab: Tab) {
-  if (!(await isRunning())) {
-    if (!tab.url) throw new Error("Ardia isn't running, and this tab has no address to reopen.");
-    await runAppleScript(openURLScript(tab.url));
+  if (!(await hasOpenWindow())) {
+    if (!tab.url) throw new Error("Ardia has no open window, and this tab has no address to reopen.");
+    await open(tab.url, BUNDLE_ID);
     return;
   }
   await runAppleScript(focusTabScript(tab));

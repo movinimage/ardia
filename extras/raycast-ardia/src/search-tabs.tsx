@@ -24,7 +24,7 @@ export default function Command() {
         <List.EmptyView
           icon={Icon.Warning}
           title="Couldn't read Ardia's tabs"
-          description="Is Ardia running, and may Raycast control it (System Settings › Privacy & Security › Automation)?"
+          description="Is an Ardia window open, and may Raycast control Ardia (System Settings › Privacy & Security › Automation)?"
         />
       ) : (
         <List.EmptyView icon={Icon.AppWindowList} title={searchText.trim() ? "No matching tabs" : "No open tabs"} />

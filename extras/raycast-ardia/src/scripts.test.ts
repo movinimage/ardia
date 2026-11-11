@@ -4,10 +4,11 @@ import {
   closeTabScript,
   focusTabScript,
   listProfilesScript,
+  hasOpenWindowScript,
   isRunningScript,
   listTabsScript,
+  NO_ARDIA_WINDOW,
   newTabScript,
-  openURLScript,
   newWindowScript,
   parseProfiles,
   parseTabs,
@@ -96,13 +97,18 @@ test("makes a tab with what was typed, or an empty one", () => {
   );
 });
 
-test("asks whether the app is running, and reopens a saved tab by address when it is not", () => {
+test("asks whether Ardia is running in a script that never names it in a tell block, so it can't start it", () => {
   assert.equal(isRunningScript(), 'return running of application id "com.ardia.browser"');
-  assert.equal(
-    openURLScript('https://example.com/?q="a"'),
-    `tell application id "com.ardia.browser"
-  activate
-  make new tab with properties {URL:"https://example.com/?q=\\"a\\""}
-end tell`,
-  );
+  assert.doesNotMatch(isRunningScript(), /\btell\b/);
+});
+
+test("the tab list stops with an error, instead of an empty list, when Ardia has no window", () => {
+  const script = listTabsScript();
+  const windows = script.indexOf(`if (count of windows) is 0 then error ${quote(NO_ARDIA_WINDOW)}`);
+  assert.ok(windows > script.indexOf("tell application id"), "checks inside the tell block");
+  assert.ok(windows < script.indexOf("id of every tab"), "checks before reading any tab");
+});
+
+test("asks Ardia whether it has a window", () => {
+  assert.equal(hasOpenWindowScript(), 'tell application id "com.ardia.browser" to return (count of windows) > 0');
 });

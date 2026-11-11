@@ -2,6 +2,10 @@ export const BUNDLE_ID = "com.ardia.browser";
 
 export const APP_TARGET = `application id "${BUNDLE_ID}"`;
 
+export const ARDIA_CLOSED = "Ardia isn't running.";
+
+export const NO_ARDIA_WINDOW = "Ardia has no open window.";
+
 export type Tab = {
   windowId: string;
   windowIndex: number;
@@ -37,6 +41,7 @@ export function listTabsScript(target = APP_TARGET) {
 set rs to character id 30
 set out to ""
 tell ${target}
+  if (count of windows) is 0 then error ${quote(NO_ARDIA_WINDOW)}
   set windowIndex to 0
   repeat with w in windows
     set windowIndex to windowIndex + 1
@@ -84,11 +89,8 @@ export function isRunningScript(target = APP_TARGET) {
   return `return running of ${target}`;
 }
 
-export function openURLScript(url: string, target = APP_TARGET) {
-  return `tell ${target}
-  activate
-  make new tab with properties {URL:${quote(url)}}
-end tell`;
+export function hasOpenWindowScript(target = APP_TARGET) {
+  return `tell ${target} to return (count of windows) > 0`;
 }
 
 export function listProfilesScript(target = APP_TARGET) {
